@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1067878525854",
+    "project_id": "autointelligence-762bb",
+    "storage_bucket": "autointelligence-762bb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1067878525854:android:df5dcbc06a9bebed6b048f",
+        "android_client_info": {
+          "package_name": "com.example.autoagent"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAR3qE-edgsUKBVZNf6WpURz_wv2vXal-Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
