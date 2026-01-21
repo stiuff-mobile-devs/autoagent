@@ -48,6 +48,10 @@ class HomePage extends GetView<HomeController> {
                 padding: EdgeInsets.all(16),
                 sliver: SliverList(
                   delegate: SliverChildListDelegate([
+                    // Localização - PRIMEIRO
+                    _buildLocationStatusIndicator(),
+                    SizedBox(height: 20),
+
                     // Status de Conexão
                     _buildConnectionStatus(),
                     SizedBox(height: 20),
@@ -483,6 +487,195 @@ class HomePage extends GetView<HomeController> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildLocationStatusIndicator() {
+    return Obx(
+      () => GestureDetector(
+        onTap: () => _showLocationStatusDialog(),
+        child: Container(
+          padding: EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                AppColors.mediumBlue().withOpacity(0.3),
+                AppColors.darkBlue().withOpacity(0.2),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: controller.getLocationStatusColor().withOpacity(0.5),
+              width: 2,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: controller.getLocationStatusColor().withOpacity(0.2),
+                blurRadius: 12,
+                spreadRadius: 2,
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 12,
+                height: 12,
+                decoration: BoxDecoration(
+                  color: controller.getLocationStatusColor(),
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: controller.getLocationStatusColor().withOpacity(
+                        0.6,
+                      ),
+                      blurRadius: 8,
+                      spreadRadius: 2,
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(width: 12),
+              Icon(
+                Icons.location_on,
+                color: controller.getLocationStatusColor(),
+                size: 24,
+              ),
+              SizedBox(width: 8),
+              Text(
+                'Rastreamento GPS',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              Spacer(),
+              Text(
+                controller.locationStatus.value == 'success'
+                    ? 'Ativo'
+                    : controller.locationStatus.value == 'warning'
+                    ? 'Aviso'
+                    : 'Erro',
+                style: TextStyle(
+                  color: controller.getLocationStatusColor(),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
+              ),
+              SizedBox(width: 8),
+              IconButton(
+                icon: Icon(
+                  Icons.refresh,
+                  color: controller.getLocationStatusColor(),
+                  size: 20,
+                ),
+                onPressed: () => controller.refreshLocation(),
+                padding: EdgeInsets.zero,
+                constraints: BoxConstraints(),
+              ),
+              SizedBox(width: 8),
+              Icon(
+                Icons.info_outline,
+                color: controller.getLocationStatusColor(),
+                size: 20,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showLocationStatusDialog() {
+    String title;
+    String message;
+    IconData icon;
+    Color color = controller.getLocationStatusColor();
+
+    switch (controller.locationStatus.value) {
+      case 'success':
+        title = 'Rastreamento Ativo';
+        icon = Icons.check_circle;
+        message =
+            'O sistema de rastreamento GPS está funcionando perfeitamente.\n\n'
+            '✓ Localização sendo atualizada regularmente\n'
+            '✓ Sinal GPS forte\n'
+            '✓ Dados sendo enviados com sucesso\n\n'
+            'Tentativas falhadas: ${controller.failedAttempts.value}';
+        break;
+      case 'warning':
+        title = 'Atenção - Falha Detectada';
+        icon = Icons.warning_amber;
+        message =
+            'Uma tentativa de atualização de localização falhou recentemente.\n\n'
+            '⚠ Última tentativa falhou\n'
+            '⚠ Sistema tentará novamente automaticamente\n'
+            '⚠ Verifique sua conexão GPS\n\n'
+            'Tentativas falhadas: ${controller.failedAttempts.value}\n\n'
+            'Se o problema persistir, verifique se o GPS está ativado nas configurações.';
+        break;
+      case 'error':
+        title = 'Erro - Rastreamento Comprometido';
+        icon = Icons.error;
+        message =
+            'Múltiplas falhas foram detectadas no sistema de rastreamento.\n\n'
+            '✗ ${controller.failedAttempts.value} tentativas consecutivas falharam\n'
+            '✗ Sinal GPS pode estar fraco ou indisponível\n'
+            '✗ Dados de localização podem estar desatualizados\n\n'
+            'AÇÕES RECOMENDADAS:\n'
+            '1. Verifique se o GPS está ativado\n'
+            '2. Certifique-se de estar em área aberta\n'
+            '3. Reinicie o aplicativo se necessário\n'
+            '4. Verifique as permissões de localização';
+        break;
+      default:
+        title = 'Status Desconhecido';
+        icon = Icons.help_outline;
+        message = 'Não foi possível determinar o status do rastreamento.';
+    }
+
+    Get.dialog(
+      AlertDialog(
+        backgroundColor: AppColors.darkBlue(),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(color: color.withOpacity(0.5), width: 2),
+        ),
+        title: Row(
+          children: [
+            Icon(icon, color: color, size: 28),
+            SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          message,
+          style: TextStyle(
+            color: Colors.white.withOpacity(0.9),
+            fontSize: 14,
+            height: 1.5,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text(
+              'ENTENDI',
+              style: TextStyle(color: color, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
       ),
     );
   }
