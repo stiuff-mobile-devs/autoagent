@@ -47,23 +47,18 @@ class LocationService extends GetxService {
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-          Get.snackbar('Erro', 'Permissão de localização negada');
           return;
         }
       }
       if (permission == LocationPermission.deniedForever) {
-        Get.snackbar('Erro', 'Permissão permanentemente negada');
         return;
       }
 
-      // Pega localização inicial
       deviceId = (await DeviceService.getBuildNumber()).toString();
+      // Pega localização inicial
       await _fetchCurrentLocation();
-
-      Get.snackbar('Sucesso', 'Localização obtida com sucesso!');
     } catch (e) {
       print('Erro ao obter localização: $e');
-      Get.snackbar('Erro', 'Falha ao obter localização');
     }
   }
 
@@ -72,11 +67,11 @@ class LocationService extends GetxService {
       position = await Geolocator.getCurrentPosition(
         timeLimit: Duration(seconds: 10),
       );
+
       startTracking();
 
       UserLocationModel userLocationModel = _createUserLocationModel();
       await FirebaseProvider().adicionarDados(userLocationModel);
-      print('Current Position: $position');
     } catch (e) {
       print('Erro ao buscar localização: $e');
     }
@@ -85,12 +80,10 @@ class LocationService extends GetxService {
   /// Inicia rastreamento contínuo do veículo
   void startTracking({Duration interval = const Duration(seconds: 10)}) {
     if (_isTracking) {
-      print('Rastreamento já está ativo');
       return;
     }
 
     _isTracking = true;
-    print('Rastreamento iniciado - Intervalo: ${interval.inSeconds}s');
 
     _locationTimer = Timer.periodic(interval, (_) async {
       await _fetchCurrentLocation();
