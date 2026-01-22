@@ -1,4 +1,4 @@
-import 'package:autoagent/app/modules/services/location_service.dart';
+import 'package:autoagent/app/services/location_service.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 

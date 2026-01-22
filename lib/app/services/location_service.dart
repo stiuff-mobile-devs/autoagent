@@ -1,3 +1,6 @@
+import 'package:autoagent/app/model/user_location_model.dart';
+import 'package:autoagent/app/services/device_service.dart';
+import 'package:autoagent/app/services/firebase_provider.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +12,7 @@ class LocationService extends GetxService {
   Position? position;
   Timer? _locationTimer;
   bool _isTracking = false;
+  String? deviceId;
 
   Future<LocationService> init() async {
     await Future.delayed(Duration(milliseconds: 500));
@@ -53,7 +57,9 @@ class LocationService extends GetxService {
       }
 
       // Pega localização inicial
+      deviceId = (await DeviceService.getBuildNumber()).toString();
       await _fetchCurrentLocation();
+
       Get.snackbar('Sucesso', 'Localização obtida com sucesso!');
     } catch (e) {
       print('Erro ao obter localização: $e');
@@ -67,6 +73,9 @@ class LocationService extends GetxService {
         timeLimit: Duration(seconds: 10),
       );
       startTracking();
+
+      UserLocationModel userLocationModel = _createUserLocationModel();
+      await FirebaseProvider().adicionarDados(userLocationModel);
       print('Current Position: $position');
     } catch (e) {
       print('Erro ao buscar localização: $e');
@@ -136,5 +145,14 @@ class LocationService extends GetxService {
   void onClose() {
     stopTracking();
     super.onClose();
+  }
+
+  UserLocationModel _createUserLocationModel() {
+    return UserLocationModel(
+      id: deviceId ?? 'unknown_device',
+      lat: position?.latitude ?? 0.0,
+      long: position?.longitude ?? 0.0,
+      timestamp: DateTime.now(),
+    );
   }
 }
