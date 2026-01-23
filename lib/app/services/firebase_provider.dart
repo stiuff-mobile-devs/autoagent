@@ -10,7 +10,7 @@ class FirebaseProvider {
     try {
       await firestore.collection('locations').doc(userLocation.id).set({
         'lat': userLocation.lat,
-        'lng': userLocation.long,
+        'long': userLocation.long,
         'timestamp': userLocation.timestamp,
       });
       print("Dados adicionados com sucesso!");
