@@ -21,15 +21,13 @@ class HomeController extends GetxController {
       'success'.obs; // 'success', 'warning', 'error'
   final RxInt failedAttempts = 0.obs;
 
-  late LocationService locationService;
+  late LocationService locationService = LocationService();
 
   @override
   void onInit() {
-    locationService = Get.find<LocationService>();
     locationService.init();
 
     super.onInit();
-    // Inicialização ou carregamento de dados pode ser feito aqui
   }
 
   /// Atualiza o status da localização
@@ -64,6 +62,5 @@ class HomeController extends GetxController {
   /// Atualiza manualmente a localização
   void refreshLocation() {
     // TODO: Implementar lógica de atualização
-    print('Refresh de localização solicitado');
   }
 }

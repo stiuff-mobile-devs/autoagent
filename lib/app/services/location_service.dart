@@ -1,4 +1,5 @@
 import 'package:autoagent/app/model/user_location_model.dart';
+import 'package:autoagent/app/modules/dashboard/controller/home_controller.dart';
 import 'package:autoagent/app/services/device_service.dart';
 import 'package:autoagent/app/services/firebase_provider.dart';
 import 'package:geolocator/geolocator.dart';
@@ -6,16 +7,18 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
-class LocationService extends GetxService {
+class LocationService {
   LocationPermission? permission;
   bool serviceEnabled = false;
   Position? position;
   Timer? _locationTimer;
   bool _isTracking = false;
   String? deviceId;
+  late HomeController _homeController;
 
   Future<LocationService> init() async {
     await Future.delayed(Duration(milliseconds: 500));
+    _homeController = Get.find<HomeController>();
     await _initializeLocation();
     return this;
   }
@@ -72,7 +75,10 @@ class LocationService extends GetxService {
 
       UserLocationModel userLocationModel = _createUserLocationModel();
       await FirebaseProvider().adicionarDados(userLocationModel);
+
+      _homeController.updateLocationStatus(true);
     } catch (e) {
+      _homeController.updateLocationStatus(false);
       print('Erro ao buscar localização: $e');
     }
   }
@@ -87,6 +93,7 @@ class LocationService extends GetxService {
 
     _locationTimer = Timer.periodic(interval, (_) async {
       await _fetchCurrentLocation();
+
       print(
         'Localização atualizada: ${position?.latitude}, ${position?.longitude}',
       );
@@ -132,12 +139,6 @@ class LocationService extends GetxService {
       ),
       barrierDismissible: false,
     );
-  }
-
-  @override
-  void onClose() {
-    stopTracking();
-    super.onClose();
   }
 
   UserLocationModel _createUserLocationModel() {
