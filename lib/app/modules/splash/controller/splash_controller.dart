@@ -1,6 +1,9 @@
 import 'dart:async';
 
+import 'package:autoagent/app/modules/user/model/user_model.dart';
 import 'package:autoagent/app/routes/app_routes.dart';
+import 'package:autoagent/app/services/google_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
 class SplashPageController extends GetxController {
@@ -11,10 +14,25 @@ class SplashPageController extends GetxController {
   void onReady() {
     super.onReady();
     Future.microtask(() => opacity.value = 1.0);
+    _checkAuth();
   }
 
   void onEnd() {
     // Navegar para a página inicial após o splash
-    Get.offAllNamed(Routes.HOME);
+  }
+
+  Future<void> _checkAuth() async {
+    // Primeiro verifica se o Firebase já tem um usuário persistido
+    var currentUser = FirebaseAuth.instance.currentUser;
+
+    // Se não tiver, tenta o login silencioso do Google
+    currentUser ??= (await GoogleService().signInSilently()) as User?;
+
+    // Redireciona conforme o resultado
+    if (currentUser != null) {
+      Get.offAllNamed(Routes.HOME);
+    } else {
+      Get.offAllNamed(Routes.LOGIN);
+    }
   }
 }

@@ -19,7 +19,6 @@ class SplashPage extends GetView<SplashPageController> {
               child: Center(
                 child: Obx(
                   () => AnimatedOpacity(
-                    onEnd: controller.onEnd,
                     opacity: controller.opacity.value,
                     duration: Duration(seconds: controller.splashDuration),
                     child: Text(
