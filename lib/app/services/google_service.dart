@@ -1,3 +1,4 @@
+import 'package:autoagent/app/config/secrets.dart';
 import 'package:autoagent/app/modules/user/model/user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb;
 import 'package:google_sign_in/google_sign_in.dart';
@@ -7,8 +8,7 @@ class GoogleService {
   final GoogleSignIn googleSignIn = GoogleSignIn.instance;
 
   late final Future<void> _init = googleSignIn.initialize(
-    serverClientId:
-        '1067878525854-cuk12s1bcru9sh8uir6t5c36ifkgu3fj.apps.googleusercontent.com',
+    serverClientId: Secrets.googleApiKey,
   );
 
   GoogleService();
