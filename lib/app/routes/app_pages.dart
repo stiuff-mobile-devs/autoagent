@@ -4,6 +4,8 @@ import 'package:autoagent/app/modules/login/bindings/login_bindings.dart';
 import 'package:autoagent/app/modules/login/ui/login_page.dart';
 import 'package:autoagent/app/modules/splash/bindings/splash_bindings.dart';
 import 'package:autoagent/app/modules/splash/ui/splash_page.dart';
+import 'package:autoagent/app/modules/vehicles/bindings/vehicles_bindings.dart';
+import 'package:autoagent/app/modules/vehicles/ui/vehicles_form_page.dart';
 import 'package:autoagent/app/routes/app_routes.dart';
 import 'package:get/get.dart';
 
@@ -23,6 +25,11 @@ abstract class AppPages {
       name: Routes.LOGIN,
       page: () => LoginPage(),
       bindings: [LoginBindings()],
+    ),
+    GetPage(
+      name: Routes.VEHICLES_FORM,
+      page: () => VehiclesFormPage(),
+      bindings: [VehiclesBinding()],
     ),
   ];
 }

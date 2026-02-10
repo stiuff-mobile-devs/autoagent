@@ -48,7 +48,7 @@ class HomePage extends GetView<HomeController> {
                 padding: EdgeInsets.all(16),
                 sliver: SliverList(
                   delegate: SliverChildListDelegate([
-                    // Localização - PRIMEIRO
+                    // Localização
                     _buildLocationStatusIndicator(),
                     SizedBox(height: 20),
 
@@ -565,6 +565,23 @@ class HomePage extends GetView<HomeController> {
                 ),
               ),
               SizedBox(width: 8),
+              Obx(() {
+                final hasSelectedVehicle =
+                    controller.selectedVehicle.isNotEmpty;
+                return IconButton(
+                  icon: Icon(
+                    Icons.directions_car,
+                    color: hasSelectedVehicle
+                        ? controller.getLocationStatusColor()
+                        : Colors.redAccent,
+                    size: 20,
+                  ),
+                  onPressed: () => _showVehicleActionsDialog(),
+                  padding: EdgeInsets.zero,
+                  constraints: BoxConstraints(),
+                );
+              }),
+              SizedBox(width: 8),
               IconButton(
                 icon: Icon(
                   Icons.refresh,
@@ -676,6 +693,126 @@ class HomePage extends GetView<HomeController> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  void _showVehicleActionsDialog() {
+    final color = controller.getLocationStatusColor();
+
+    Get.dialog(
+      AlertDialog(
+        backgroundColor: AppColors.darkBlue(),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(color: color.withOpacity(0.5), width: 2),
+        ),
+        title: Row(
+          children: [
+            Icon(Icons.directions_car, color: color, size: 28),
+            SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                'Veículos',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Selecione um veiculo',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            SizedBox(height: 12),
+            ...controller.userVehicles.map((vehicle) {
+              final name = (vehicle['name'] ?? '').toString();
+              final placa = (vehicle['placa'] ?? '').toString();
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: _buildVehicleActionButton(
+                  icon: Icons.directions_car,
+                  label: '$name - $placa',
+                  color: color,
+                  onTap: () {
+                    controller.selectVehicle(vehicle);
+                    Get.back();
+                  },
+                ),
+              );
+            }),
+            _buildVehicleActionButton(
+              icon: Icons.add,
+              label: 'Criar veiculo',
+              color: color,
+              onTap: () {
+                Get.back();
+                controller.createVehicle();
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildVehicleActionButton({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(vertical: 12, horizontal: 14),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              color.withOpacity(0.25),
+              AppColors.darkBlue().withOpacity(0.6),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: color.withOpacity(0.5), width: 1.5),
+          boxShadow: [
+            BoxShadow(
+              color: color.withOpacity(0.2),
+              blurRadius: 10,
+              spreadRadius: 1,
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: color, size: 20),
+            SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                label,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            Icon(Icons.chevron_right, color: color),
+          ],
+        ),
       ),
     );
   }

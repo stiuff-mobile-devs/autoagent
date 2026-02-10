@@ -1,6 +1,11 @@
+import 'package:autoagent/app/modules/dashboard/repository/home_repository.dart';
+import 'package:autoagent/app/routes/app_routes.dart';
+import 'package:autoagent/app/services/firebase_provider.dart';
 import 'package:autoagent/app/services/location_service.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get_connect/http/src/utils/utils.dart';
 
 class HomeController extends GetxController {
   // Variáveis reativas de dados OBD2
@@ -22,10 +27,22 @@ class HomeController extends GetxController {
   final RxInt failedAttempts = 0.obs;
 
   late LocationService locationService = LocationService();
+  final HomeRepository _repository = HomeRepository();
+  late dynamic user;
+
+  List<Map<String, dynamic>> userVehicles = [];
+  var selectedVehicle = {}.obs;
 
   @override
   void onInit() {
-    locationService.init();
+    user = Get.arguments;
+    if (user == null) {
+      throw Exception("Usuário não encontrado nos argumentos");
+    } else {
+      getUserVehicles();
+    }
+
+    // locationService.init();
 
     super.onInit();
   }
@@ -62,5 +79,22 @@ class HomeController extends GetxController {
   /// Atualiza manualmente a localização
   void refreshLocation() {
     // TODO: Implementar lógica de atualização
+  }
+
+  Future<void> getUserVehicles() async {
+    try {
+      userVehicles = await _repository.findVehiclesByEmail(user.email);
+      print("Veículos do usuário: $userVehicles");
+    } catch (e) {
+      throw Exception("Erro ao buscar veículos do usuário: $e");
+    }
+  }
+
+  Future<void> createVehicle() async {
+    Get.toNamed(Routes.VEHICLES_FORM, arguments: user);
+  }
+
+  void selectVehicle(Map<String, dynamic> vehicle) {
+    selectedVehicle.value = vehicle;
   }
 }

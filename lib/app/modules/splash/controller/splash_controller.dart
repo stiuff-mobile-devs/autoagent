@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:autoagent/app/modules/user/model/user_model.dart';
 import 'package:autoagent/app/routes/app_routes.dart';
 import 'package:autoagent/app/services/google_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -17,10 +16,6 @@ class SplashPageController extends GetxController {
     _checkAuth();
   }
 
-  void onEnd() {
-    // Navegar para a página inicial após o splash
-  }
-
   Future<void> _checkAuth() async {
     // Primeiro verifica se o Firebase já tem um usuário persistido
     var currentUser = FirebaseAuth.instance.currentUser;
@@ -30,7 +25,7 @@ class SplashPageController extends GetxController {
 
     // Redireciona conforme o resultado
     if (currentUser != null) {
-      Get.offAllNamed(Routes.HOME);
+      Get.offAllNamed(Routes.HOME, arguments: currentUser);
     } else {
       Get.offAllNamed(Routes.LOGIN);
     }

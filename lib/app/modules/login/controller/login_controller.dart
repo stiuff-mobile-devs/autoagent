@@ -16,7 +16,7 @@ class LoginController extends GetxController {
       UserModel? user = await _signInService.signInWithGoogle();
       if (user != null) {
         await _saveUser(user);
-        _goToHomePage();
+        Get.offAllNamed(Routes.HOME, arguments: user);
       }
     } finally {
       isLoading(false);
@@ -28,9 +28,5 @@ class LoginController extends GetxController {
     if (isSaved == null) {
       await _repository.addUser(user);
     }
-  }
-
-  _goToHomePage() {
-    Get.offAllNamed(Routes.HOME);
   }
 }
