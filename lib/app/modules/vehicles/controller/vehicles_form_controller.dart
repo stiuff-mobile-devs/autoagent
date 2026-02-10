@@ -1,6 +1,7 @@
 import 'package:autoagent/app/modules/vehicles/data/model/vehicles_model.dart';
 import 'package:autoagent/app/modules/vehicles/data/repository/vehicles_repository.dart';
 import 'package:autoagent/app/routes/app_routes.dart';
+import 'package:autoagent/app/utils/app_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -33,7 +34,11 @@ class VehiclesFormController extends GetxController {
     }
 
     if (user.email.isEmpty) {
-      Get.snackbar('Erro', 'Usuario sem email valido');
+      AppSnackbar.show(
+        'Erro',
+        'Usuario sem email valido',
+        type: SnackType.error,
+      );
       return;
     }
 
@@ -46,13 +51,21 @@ class VehiclesFormController extends GetxController {
 
     try {
       await _repository.createVehicle(vehicle);
-      Get.snackbar('Sucesso', 'Veiculo criado com sucesso');
+      AppSnackbar.show(
+        'Sucesso',
+        'Veiculo criado com sucesso',
+        type: SnackType.success,
+      );
       formState.reset();
       nameController.clear();
       placaController.clear();
       Get.offAllNamed(Routes.HOME, arguments: user);
     } catch (e) {
-      Get.snackbar('Erro', 'Nao foi possivel criar o veiculo');
+      AppSnackbar.show(
+        'Erro',
+        'Nao foi possivel criar o veiculo',
+        type: SnackType.error,
+      );
     }
   }
 }

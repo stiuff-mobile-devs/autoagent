@@ -723,45 +723,116 @@ class HomePage extends GetView<HomeController> {
             ),
           ],
         ),
+        content: Obx(() {
+          final selectedId = controller.selectedVehicle['id'];
+
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Selecione um veiculo',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              SizedBox(height: 12),
+              ...controller.userVehicles.map((vehicle) {
+                final name = (vehicle['name'] ?? '').toString();
+                final placa = (vehicle['placa'] ?? '').toString();
+                final isSelected =
+                    selectedId != null && selectedId == vehicle['id'];
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: _buildVehicleActionButton(
+                    icon: Icons.directions_car,
+                    label: '$name - $placa',
+                    color: color,
+                    isSelected: isSelected,
+                    onTap: () {
+                      controller.selectVehicle(vehicle);
+                      _showVehicleInfoDialog(vehicle);
+                    },
+                  ),
+                );
+              }),
+              _buildVehicleActionButton(
+                icon: Icons.add,
+                label: 'Criar veiculo',
+                color: color,
+                onTap: () {
+                  Get.back();
+                  controller.createVehicle();
+                },
+              ),
+            ],
+          );
+        }),
+      ),
+    );
+  }
+
+  void _showVehicleInfoDialog(Map<String, dynamic> vehicle) {
+    final name = (vehicle['name'] ?? '').toString();
+    final placa = (vehicle['placa'] ?? '').toString();
+    final email = (vehicle['email'] ?? '').toString();
+    final createdAt = (vehicle['createdAt'] ?? '').toString();
+
+    Get.dialog(
+      AlertDialog(
+        backgroundColor: AppColors.darkBlue(),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(
+            color: AppColors.lightBlue().withOpacity(0.5),
+            width: 2,
+          ),
+        ),
+        title: Row(
+          children: [
+            Icon(Icons.directions_car, color: AppColors.lightBlue(), size: 24),
+            SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                'Veiculo selecionado',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ],
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Selecione um veiculo',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
+            Text('Nome: $name', style: TextStyle(color: Colors.white)),
+            SizedBox(height: 6),
+            Text('Placa: $placa', style: TextStyle(color: Colors.white)),
+            SizedBox(height: 6),
+            if (email.isNotEmpty)
+              Text('Email: $email', style: TextStyle(color: Colors.white)),
+            if (createdAt.isNotEmpty) ...[
+              SizedBox(height: 6),
+              Text(
+                'Criado em: $createdAt',
+                style: TextStyle(color: Colors.white),
               ),
-            ),
-            SizedBox(height: 12),
-            ...controller.userVehicles.map((vehicle) {
-              final name = (vehicle['name'] ?? '').toString();
-              final placa = (vehicle['placa'] ?? '').toString();
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: _buildVehicleActionButton(
-                  icon: Icons.directions_car,
-                  label: '$name - $placa',
-                  color: color,
-                  onTap: () {
-                    controller.selectVehicle(vehicle);
-                    Get.back();
-                  },
-                ),
-              );
-            }),
-            _buildVehicleActionButton(
-              icon: Icons.add,
-              label: 'Criar veiculo',
-              color: color,
-              onTap: () {
-                Get.back();
-                controller.createVehicle();
-              },
-            ),
+            ],
           ],
         ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text(
+              'Fechar',
+              style: TextStyle(color: AppColors.lightBlue()),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -771,7 +842,9 @@ class HomePage extends GetView<HomeController> {
     required String label,
     required Color color,
     required VoidCallback onTap,
+    bool isSelected = false,
   }) {
+    final highlightColor = isSelected ? AppColors.lightBlue() : color;
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(14),
@@ -781,25 +854,28 @@ class HomePage extends GetView<HomeController> {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              color.withOpacity(0.25),
-              AppColors.darkBlue().withOpacity(0.6),
+              highlightColor.withOpacity(0.25),
+              AppColors.darkBlue().withOpacity(isSelected ? 0.8 : 0.6),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: color.withOpacity(0.5), width: 1.5),
+          border: Border.all(
+            color: highlightColor.withOpacity(isSelected ? 0.9 : 0.5),
+            width: isSelected ? 2 : 1.5,
+          ),
           boxShadow: [
             BoxShadow(
-              color: color.withOpacity(0.2),
-              blurRadius: 10,
-              spreadRadius: 1,
+              color: highlightColor.withOpacity(isSelected ? 0.35 : 0.2),
+              blurRadius: isSelected ? 14 : 10,
+              spreadRadius: isSelected ? 2 : 1,
             ),
           ],
         ),
         child: Row(
           children: [
-            Icon(icon, color: color, size: 20),
+            Icon(icon, color: highlightColor, size: 20),
             SizedBox(width: 10),
             Expanded(
               child: Text(
@@ -810,7 +886,10 @@ class HomePage extends GetView<HomeController> {
                 ),
               ),
             ),
-            Icon(Icons.chevron_right, color: color),
+            Icon(
+              isSelected ? Icons.check_circle : Icons.chevron_right,
+              color: highlightColor,
+            ),
           ],
         ),
       ),

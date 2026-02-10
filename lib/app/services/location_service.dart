@@ -1,6 +1,7 @@
 import 'package:autoagent/app/model/user_location_model.dart';
 import 'package:autoagent/app/modules/dashboard/controller/home_controller.dart';
 import 'package:autoagent/app/services/firebase_provider.dart';
+import 'package:autoagent/app/utils/app_snackbar.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
@@ -39,7 +40,11 @@ class LocationService {
         serviceEnabled = await Geolocator.isLocationServiceEnabled();
 
         if (!serviceEnabled) {
-          Get.snackbar('Erro', 'Localização permanece desativada');
+          AppSnackbar.show(
+            'Erro',
+            'Localizacao permanece desativada',
+            type: SnackType.error,
+          );
           return;
         }
       }
@@ -105,7 +110,7 @@ class LocationService {
       _locationTimer?.cancel();
       _isTracking = false;
       print('Rastreamento parado');
-      Get.snackbar('Info', 'Rastreamento parado');
+      AppSnackbar.show('Info', 'Rastreamento parado');
     }
   }
 
