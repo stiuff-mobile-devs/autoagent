@@ -1,5 +1,6 @@
 import 'package:autoagent/app/modules/vehicles/data/model/vehicles_model.dart';
 import 'package:autoagent/app/modules/vehicles/data/repository/vehicles_repository.dart';
+import 'package:autoagent/app/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -49,6 +50,7 @@ class VehiclesFormController extends GetxController {
       formState.reset();
       nameController.clear();
       placaController.clear();
+      Get.offAllNamed(Routes.HOME, arguments: user);
     } catch (e) {
       Get.snackbar('Erro', 'Nao foi possivel criar o veiculo');
     }
