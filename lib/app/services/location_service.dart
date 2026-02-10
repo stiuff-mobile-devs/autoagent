@@ -1,6 +1,5 @@
 import 'package:autoagent/app/model/user_location_model.dart';
 import 'package:autoagent/app/modules/dashboard/controller/home_controller.dart';
-import 'package:autoagent/app/services/device_service.dart';
 import 'package:autoagent/app/services/firebase_provider.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
@@ -13,12 +12,13 @@ class LocationService {
   Position? position;
   Timer? _locationTimer;
   bool _isTracking = false;
-  String? deviceId;
+  late String vehicleId;
   late HomeController _homeController;
 
-  Future<LocationService> init() async {
+  Future<LocationService> init(String vehicleId) async {
     await Future.delayed(Duration(milliseconds: 500));
     _homeController = Get.find<HomeController>();
+    this.vehicleId = vehicleId;
     await _initializeLocation();
     return this;
   }
@@ -57,7 +57,6 @@ class LocationService {
         return;
       }
 
-      deviceId = (await DeviceService.getBuildNumber()).toString();
       // Pega localização inicial
       await _fetchCurrentLocation();
     } catch (e) {
@@ -143,7 +142,7 @@ class LocationService {
 
   UserLocationModel _createUserLocationModel() {
     return UserLocationModel(
-      id: deviceId ?? 'unknown_device',
+      id: vehicleId,
       lat: position?.latitude ?? 0.0,
       long: position?.longitude ?? 0.0,
       timestamp: DateTime.now(),
