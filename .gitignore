@@ -47,3 +47,5 @@ app.*.map.json
 Secrets.dart
 google-services.json
 android/app/google-services.json
+upload-keystore.jks
+android/app/google-services.json
