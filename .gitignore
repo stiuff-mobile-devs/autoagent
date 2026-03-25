@@ -49,3 +49,4 @@ google-services.json
 android/app/google-services.json
 upload-keystore.jks
 android/app/google-services.json
+lib/app/config/secrets.dart

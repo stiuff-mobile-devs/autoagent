@@ -1,4 +1,4 @@
-package br.uff.sti.autoagent
+package br.uff.dvu
 
 import io.flutter.embedding.android.FlutterActivity
 
